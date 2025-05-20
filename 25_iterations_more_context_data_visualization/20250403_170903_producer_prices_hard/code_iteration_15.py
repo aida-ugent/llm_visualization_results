@@ -1,0 +1,85 @@
+# Automatically saved code from agent execution
+# Run ID: 20250403_170903_producer_prices_hard, Iteration: 15
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+
+# Load the data
+df = pd.read_csv('/Users/alexanderrogiers/ugent/llm_visualization/data/ppi.csv')
+
+# Extract year from the 'Periods' column
+df['Year'] = df['Periods'].str.extract(r'(\d{4})').astype(int)
+
+# Focus on 'Total sales' to get a consistent view across product categories
+df_filtered = df[df['OutputAndImportPrices'] == 'Total sales']
+
+# Get a list of unique product categories
+unique_products = df_filtered['ProductsAccordingToPRODCOMList'].unique()
+
+# Print the first few characters of each unique product to understand the pattern
+product_prefixes = [prod[:3] if len(prod) >= 3 else prod for prod in unique_products]
+unique_prefixes = set(product_prefixes)
+
+# Select categories based on their prefixes
+# We'll select categories that start with a letter (main categories) or a number (major subcategories)
+selected_categories = []
+for prod in unique_products:
+    # Main categories (start with a letter)
+    if prod[0].isalpha() and len(prod) <= 30:  # Limit length to avoid very specific subcategories
+        if ' ' in prod and not any(char.isdigit() for char in prod[:2]):
+            selected_categories.append(prod)
+    # Major subcategories (start with a number)
+    elif prod[0].isdigit() and ' ' in prod and len(prod) <= 30:
+        if len(prod.split(' ')[0]) <= 3:  # Only include categories with short numeric codes
+            selected_categories.append(prod)
+
+# Calculate yearly averages for each selected product category
+yearly_avg = df_filtered[df_filtered['ProductsAccordingToPRODCOMList'].isin(selected_categories)]
+yearly_avg = yearly_avg.groupby(['ProductsAccordingToPRODCOMList', 'Year'])['PriceIndexNumbersExcludingExcise_1'].mean().reset_index()
+
+# Create a pivot table for the heatmap
+pivot_data = yearly_avg.pivot_table(
+    values='PriceIndexNumbersExcludingExcise_1',
+    index='ProductsAccordingToPRODCOMList',
+    columns='Year'
+)
+
+# Create a figure with appropriate size
+plt.figure(figsize=(16, 20))
+
+# Create the heatmap
+ax = sns.heatmap(
+    pivot_data,
+    annot=True,  # Show the values
+    fmt='.1f',   # Format to 1 decimal place
+    cmap='YlOrRd',  # Yellow-Orange-Red color map
+    linewidths=0.5,
+    cbar_kws={'label': 'Price Index (2015=100)'}
+)
+
+# Customize the plot
+plt.title('Producer Price Index by Product Category and Year (2015=100)', fontsize=16, pad=20)
+plt.xlabel('Year', fontsize=12)
+plt.ylabel('Product Category', fontsize=12)
+
+# Rotate y-axis labels for better readability
+plt.xticks(rotation=0)
+plt.yticks(rotation=0, fontsize=8)  # Smaller font for y-axis labels due to many categories
+
+# Add a note about the data
+plt.figtext(0.5, 0.01, 'Note: Values represent yearly averages of monthly price indices (2015=100)', 
+            ha='center', fontsize=10, style='italic')
+
+# Highlight the reference year (2015)
+for i, year in enumerate(pivot_data.columns):
+    if year == 2015:
+        plt.axvline(x=i+0.5, color='blue', linestyle='--', alpha=0.5)
+        break
+
+# Adjust layout
+plt.tight_layout()
+
+# Save the plot
+plt.savefig('/Users/alexanderrogiers/ugent/llm_visualization/output/20250403_170903_producer_prices_hard/visualization.png', dpi=300, bbox_inches='tight')
