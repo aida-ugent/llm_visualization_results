@@ -1,4 +1,43 @@
-# llm_visualization_results
-25_iterations_more_context_data_visualization contains code and figures
-corresponding to the different prompts generated with at most 25 iterations of
-our agentic LLM visualization system.
+# Are LLMs Ready to Help Non-Expert Users Make Charts of Official Statistics Data?
+
+This repository contains the complete experimental data and results supporting our research on LLM-based automated chart generation from official statistics data.
+
+## Research Overview
+
+This study evaluates the capability of Large Language Models (LLMs) to democratize access to official statistics by automatically generating visualizations from complex tabular data in response to natural language queries. Working with diverse datasets from Statistics Netherlands, we assessed whether current generative AI models can bridge the gap between expert data analysis and non-expert user needs.
+
+## Repository Contents
+
+### Experimental Results (`25_iterations_more_context_data_visualization/`)
+
+Contains 24 experimental runs across 7 official Statistics Netherlands datasets, each tested at three difficulty levels:
+
+#### Datasets from Statistics Netherlands
+- **Industry Production** - Industrial output and manufacturing statistics
+- **Milk Supply** - Agricultural supply chain data
+- **Caribbean Births** - Demographic birth statistics for Caribbean Netherlands
+- **Consumer Prices** - Consumer price index and inflation data
+- **Producer Prices** - Manufacturing and wholesale price indices
+- **Municipal Accounts** - Local government financial statistics
+- **Population** - Demographic and population census data
+
+#### Task Complexity Levels
+- **Easy** - Direct visualization of single data series
+- **Medium** - Multi-step data processing with moderate complexity
+- **Hard** - Complex analytical tasks requiring sophisticated data manipulation
+
+### Directory Structure
+
+Each experiment is timestamped: `YYYYMMDD_HHMMSS_[dataset]_[difficulty]`
+
+**Contents per experiment:**
+- **`.log`** - Complete reasoning process and decision-making trace
+- **`code_iteration_X.py`** - Evolution of generated Python code across iterations
+- **`visualization.png`** - Final chart output
+
+### Core Evaluation Documents
+
+- **`final_evaluation_results.pdf`** - Complete quantitative and qualitative analysis
+- **`summary_results_by_difficulty.pdf`** - Performance trends across complexity levels
+- **`full_evaluation_questions.pdf`** - All evaluation prompts and assessment criteria
+- **`full_list_of_prompts.pdf`** - Complete prompt engineering details
